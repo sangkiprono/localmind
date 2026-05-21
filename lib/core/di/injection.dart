@@ -12,7 +12,7 @@ import '../../presentation/categories/bloc/category_bloc.dart';
 final getIt = GetIt.instance;
 
 Future<void> configureDependencies() async {
-  final db = AppDatabase();
+  final db = await AppDatabase.create();
   getIt.registerSingleton<AppDatabase>(db);
   getIt.registerSingleton<RemindersDao>(db.remindersDao);
   getIt.registerSingleton<CategoriesDao>(db.categoriesDao);
