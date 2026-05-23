@@ -45,3 +45,10 @@ class FilterByCategory extends ReminderEvent {
   @override
   List<Object?> get props => [categoryId];
 }
+
+class SearchReminders extends ReminderEvent {
+  final String query;
+  const SearchReminders(this.query);
+  @override
+  List<Object?> get props => [query];
+}

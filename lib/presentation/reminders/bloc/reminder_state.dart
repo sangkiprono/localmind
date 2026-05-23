@@ -19,13 +19,15 @@ class ReminderLoaded extends ReminderState {
   final List<Reminder> reminders;
   final List<Reminder> filtered;
   final String? activeCategoryId;
+  final String searchQuery;
   const ReminderLoaded({
     required this.reminders,
     required this.filtered,
     this.activeCategoryId,
+    this.searchQuery = '',
   });
   @override
-  List<Object?> get props => [reminders, filtered, activeCategoryId];
+  List<Object?> get props => [reminders, filtered, activeCategoryId, searchQuery];
 }
 
 class ReminderError extends ReminderState {

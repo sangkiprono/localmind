@@ -1,5 +1,5 @@
 import 'package:drift/drift.dart';
-import 'package:drift/wasm.dart';
+import 'package:drift_flutter/drift_flutter.dart';
 import '../database/tables.dart';
 import '../dao/reminders_dao.dart';
 import '../dao/categories_dao.dart';
@@ -8,16 +8,7 @@ part 'app_database.g.dart';
 
 @DriftDatabase(tables: [Reminders, Categories], daos: [RemindersDao, CategoriesDao])
 class AppDatabase extends _$AppDatabase {
-  AppDatabase._internal(super.e);
-
-  static Future<AppDatabase> create() async {
-    final db = await WasmDatabase.open(
-      databaseName: 'localmind_db',
-      sqlite3Uri: Uri.parse('/sql-wasm.wasm'),
-      driftWorkerUri: Uri.parse('/drift_worker.dart.js'),
-    );
-    return AppDatabase._internal(db.resolvedExecutor);
-  }
+  AppDatabase() : super(_openConnection());
 
   @override
   int get schemaVersion => 1;
@@ -40,4 +31,8 @@ class AppDatabase extends _$AppDatabase {
       await into(categories).insert(cat);
     }
   }
+}
+
+QueryExecutor _openConnection() {
+  return driftDatabase(name: 'localmind_db');
 }

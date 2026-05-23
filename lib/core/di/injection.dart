@@ -8,11 +8,13 @@ import '../../domain/repositories/reminder_repository.dart';
 import '../../domain/repositories/category_repository.dart';
 import '../../presentation/reminders/bloc/reminder_bloc.dart';
 import '../../presentation/categories/bloc/category_bloc.dart';
+import '../../services/notifications/notification_service.dart';
+import '../../core/theme/theme_cubit.dart';
 
 final getIt = GetIt.instance;
 
 Future<void> configureDependencies() async {
-  final db = await AppDatabase.create();
+  final db = AppDatabase();
   getIt.registerSingleton<AppDatabase>(db);
   getIt.registerSingleton<RemindersDao>(db.remindersDao);
   getIt.registerSingleton<CategoriesDao>(db.categoriesDao);
@@ -22,10 +24,16 @@ Future<void> configureDependencies() async {
   getIt.registerSingleton<CategoryRepository>(
     CategoryRepositoryImpl(getIt<CategoriesDao>()),
   );
+  final notificationService = NotificationService();
+  await notificationService.init();
+  getIt.registerSingleton<NotificationService>(notificationService);
   getIt.registerFactory<ReminderBloc>(
-    () => ReminderBloc(getIt<ReminderRepository>()),
+    () => ReminderBloc(getIt<ReminderRepository>(), getIt<NotificationService>()),
   );
   getIt.registerFactory<CategoryBloc>(
     () => CategoryBloc(getIt<CategoryRepository>()),
   );
+  final themeCubit = ThemeCubit();
+  await themeCubit.loadTheme();
+  getIt.registerSingleton<ThemeCubit>(themeCubit);
 }

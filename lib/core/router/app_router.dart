@@ -9,12 +9,12 @@ class AppRouter {
   static final router = GoRouter(
     initialLocation: '/reminders',
     routes: [
-      GoRoute(path: '/reminders', builder: (context, state) => const RemindersPage()),
-      GoRoute(path: '/reminders/new', builder: (context, state) => const ReminderFormPage()),
-      GoRoute(path: '/reminders/:id', builder: (context, state) => ReminderFormPage(reminder: state.extra as dynamic)),
-      GoRoute(path: '/categories', builder: (context, state) => const CategoriesPage()),
-      GoRoute(path: '/analytics', builder: (context, state) => const AnalyticsPage()),
-      GoRoute(path: '/settings', builder: (context, state) => const SettingsPage()),
+      GoRoute(path: '/reminders', name: 'reminders', builder: (context, state) => const RemindersPage()),
+      GoRoute(path: '/reminders/new', name: 'new-reminder', builder: (context, state) => const ReminderFormPage()),
+      GoRoute(path: '/reminders/:id', name: 'edit-reminder', builder: (context, state) => ReminderFormPage(reminder: state.extra as dynamic)),
+      GoRoute(path: '/categories', name: 'categories', builder: (context, state) => const CategoriesPage()),
+      GoRoute(path: '/analytics', name: 'analytics', builder: (context, state) => const AnalyticsPage()),
+      GoRoute(path: '/settings', name: 'settings', builder: (context, state) => const SettingsPage()),
     ],
   );
 }

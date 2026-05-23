@@ -20,23 +20,53 @@ class RemindersPage extends StatelessWidget {
   }
 }
 
-class _RemindersView extends StatelessWidget {
+class _RemindersView extends StatefulWidget {
   const _RemindersView();
+
+  @override
+  State<_RemindersView> createState() => _RemindersViewState();
+}
+
+class _RemindersViewState extends State<_RemindersView> {
+  final _searchController = TextEditingController();
+  bool _showSearch = false;
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('LocalMind'),
+        title: _showSearch
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: const InputDecoration(
+                  hintText: 'Search reminders...',
+                  border: InputBorder.none,
+                ),
+                onChanged: (q) => context.read<ReminderBloc>().add(SearchReminders(q)),
+              )
+            : const Text('LocalMind'),
         centerTitle: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {},
+            icon: Icon(_showSearch ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() => _showSearch = !_showSearch);
+              if (!_showSearch) {
+                _searchController.clear();
+                context.read<ReminderBloc>().add(const SearchReminders(''));
+              }
+            },
           ),
           IconButton(
             icon: const Icon(Icons.tune),
-            onPressed: () {},
+            onPressed: () => _showFilterSheet(context),
           ),
         ],
       ),
@@ -90,6 +120,57 @@ class _RemindersView extends StatelessWidget {
             case 3: context.go('/settings'); break;
           }
         },
+      ),
+    );
+  }
+
+  void _showFilterSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      builder: (_) => BlocProvider.value(
+        value: context.read<ReminderBloc>(),
+        child: const _FilterSheet(),
+      ),
+    );
+  }
+}
+
+class _FilterSheet extends StatelessWidget {
+  const _FilterSheet();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Filter by Priority', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            children: [
+              FilterChip(label: const Text('All'), selected: true, onSelected: (_) => Navigator.pop(context)),
+              FilterChip(label: const Text('High'), selected: false, onSelected: (_) => Navigator.pop(context)),
+              FilterChip(label: const Text('Medium'), selected: false, onSelected: (_) => Navigator.pop(context)),
+              FilterChip(label: const Text('Low'), selected: false, onSelected: (_) => Navigator.pop(context)),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Text('Filter by Status', style: Theme.of(context).textTheme.titleMedium),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            children: [
+              FilterChip(label: const Text('All'), selected: true, onSelected: (_) => Navigator.pop(context)),
+              FilterChip(label: const Text('Pending'), selected: false, onSelected: (_) => Navigator.pop(context)),
+              FilterChip(label: const Text('Completed'), selected: false, onSelected: (_) => Navigator.pop(context)),
+              FilterChip(label: const Text('Overdue'), selected: false, onSelected: (_) => Navigator.pop(context)),
+            ],
+          ),
+          const SizedBox(height: 16),
+        ],
       ),
     );
   }
