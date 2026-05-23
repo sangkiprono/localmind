@@ -9,6 +9,7 @@ class AppTheme {
           seedColor: _primaryColor,
           brightness: Brightness.light,
         ),
+        fontFamily: 'Roboto',
       );
 
   static ThemeData get dark => ThemeData(
@@ -17,5 +18,6 @@ class AppTheme {
           seedColor: _primaryColor,
           brightness: Brightness.dark,
         ),
+        fontFamily: 'Roboto',
       );
 }
