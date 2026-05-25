@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:share_plus/share_plus.dart';
 import '../../../core/di/injection.dart';
 import '../../../core/theme/theme_cubit.dart';
+import '../../../domain/usecases/data_usecases.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: getIt<ThemeCubit>(),
-      child: const _SettingsView(),
-    );
+    return const _SettingsView();
   }
 }
 
@@ -55,7 +54,7 @@ class _SettingsView extends StatelessWidget {
               ListTile(
                 title: const Text('Export Reminders'),
                 trailing: const Icon(Icons.download_outlined),
-                onTap: () {},
+                onTap: () => _exportData(context),
               ),
               ListTile(
                 title: const Text('Clear All Data'),
@@ -76,6 +75,17 @@ class _SettingsView extends StatelessWidget {
     );
   }
 
+  Future<void> _exportData(BuildContext context) async {
+    try {
+      final csv = await getIt<ExportDataUseCase>().toCsv();
+      await Share.share(csv, subject: 'LocalMind Reminders Export');
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Export failed: ' + e.toString())),
+      );
+    }
+  }
+
   void _confirmClearData(BuildContext context) {
     showDialog(
       context: context,
@@ -85,7 +95,15 @@ class _SettingsView extends StatelessWidget {
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () async {
+              Navigator.pop(context);
+              await getIt<ClearAllDataUseCase>().execute();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('All data cleared')),
+                );
+              }
+            },
             child: const Text('Clear', style: TextStyle(color: Colors.red)),
           ),
         ],
